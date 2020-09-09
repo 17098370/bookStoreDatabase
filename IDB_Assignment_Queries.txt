@@ -1,0 +1,78 @@
+--i. A list of latest book sent by various publishers based on monthly basis.(Descending)
+SELECT * FROM Book
+ORDER BY YEAR(Date_received) DESC, MONTH(Date_received) DESC, DAY(Date_received) DESC
+
+--i. A list of latest book sent by various publishers based on monthly basis.(Ascending)
+SELECT * FROM Book
+ORDER BY MONTH(Date_received),DAY(Date_received)
+
+--ii.	A list of books ordered by store manager from various publishers based on monthly basis.(Descending)
+SELECT * FROM Book
+WHERE OrderStatus = 'Ordered'
+ORDER BY MONTH(Date_received),DAY(Date_received)
+
+--ii.	A list of books ordered by store manager from various publishers based on monthly basis.(Ascending)
+SELECT * FROM Book
+ORDER BY MONTH(Date_received),DAY(Date_received)
+
+--iii.	Produce a record of invoices for various publishers. The invoice consists of invoice number, invoice date, publisher’s names & addresses and total amount to be paid.
+SELECT Invoice.Invoice_ID, Invoice.Invoice_Date, Publisher.First_Name, Publisher.Last_Name, Publisher.House_No, Publisher.Address_Line1,
+Publisher.Address_Line2,Publisher.Post_Code, Publisher.City, Publisher.City_State, Publisher.Country, Invoice.Price
+FROM Invoice, Publisher, Manager_Order
+WHERE Manager_Order.Order_ID = Invoice.Order_ID AND Manager_Order.Publisher_ID = Publisher.Publisher_ID
+
+--iii. Inner Join Method
+SELECT Invoice.Invoice_ID, Invoice.Invoice_Date, Publisher.First_Name, Publisher.Last_Name, Publisher.House_No, Publisher.Address_Line1,
+Publisher.Address_Line2,Publisher.Post_Code, Publisher.City, Publisher.City_State, Publisher.Country, Invoice.Price
+FROM Manager_Order
+INNER JOIN Publisher 
+ON Publisher.Publisher_ID = Manager_Order.Publisher_ID 
+INNER JOIN Invoice
+ON Invoice.Order_ID = Manager_Order.Order_ID
+
+--iv.	A list of all customer records who are registered members in APU E-Bookstore. The record of each member should show member identification number, first name and last name, address and contact number.  
+SELECT * FROM Customer
+
+--v.	A list of purchased books that have been delivered to members. The list should show member identification number, first name and last name, address, contact number, book serial number, book title, quantity, date and status of delivery.
+SELECT Customer_Purchase.Customer_ID, Customer.First_Name, Customer.Last_Name, Customer.House_No, Customer.Address_Line1,
+Customer.Address_Line2,Customer.Post_Code, Customer.City, Customer.City_State, Customer.Country, Customer.Contact_Number, Book.Book_ID, Book.Title, Purchase_Details.Quantity, Customer_Purchase.Purchase_Date, Purchase_Details.Shipment_Status
+FROM Purchase_Details
+INNER JOIN Customer_Purchase 
+ON Purchase_Details.Purchase_ID = Customer_Purchase.Purchase_ID 
+INNER JOIN Customer
+ON Customer_Purchase.Customer_ID = Customer.Customer_ID
+INNER JOIN Book
+ON Purchase_Details.Book_ID = Book.Book_ID
+WHERE Purchase_Details.Shipment_Status = 'Delivered'
+
+--vi.	List of books based on specific categories (e.g. Science Fiction, Romantic, History, Horror, etc.). The list should show type of book category, book serial number, book title and quantity. 
+SELECT Genres, Book_ID, Title, Quantity FROM Book
+ORDER BY Genres
+
+--vii.	Produce list of total number of books for each category of books.
+SELECT Genres, COUNT(*) AS Total_Number_Of_Books FROM Book GROUP BY Genres
+
+--viii.	A list of total books and its total price as added by members in shopping cart.
+SELECT Customer.First_Name, Customer.Last_Name, Book.Title, Customer_Cart.Total_Price
+FROM Customer_Cart
+INNER JOIN Cart_Details
+ON Customer_Cart.Customer_Cart_ID = Cart_Details.Customer_Cart_ID
+INNER JOIN Customer
+ON Customer_Cart.Customer_ID = Customer.Customer_ID 
+INNER JOIN Book
+ON Cart_Details.Book_ID = Book.Book_ID
+
+--ix.	Produce a list of book with the number of various feedbacks for books based on scores (1-10 which is 0= terrible, 10= masterpiece) rated by members.
+SELECT Book.Book_ID, Book.Title, Feedback_Details.Rating, Feedback_Details.Comment
+FROM Customer_Feedback
+INNER JOIN Feedback_Details
+ON Customer_Feedback.Feedback_ID = Feedback_Details.Feedback_ID
+INNER JOIN Book
+ON Feedback_Details.Book_ID = Book.Book_ID
+ORDER BY Book.Book_ID
+
+***REFERENCES**
+1)http://stackoverflow.com/questions/4676139/order-by-descending-date-month-day-and-year
+2)http://stackoverflow.com/questions/2360396/how-can-i-merge-the-columns-from-two-tables-into-one-output
+3)http://stackoverflow.com/questions/10687773/how-to-count-items-per-category
+PS: not sure stackover can use as references or not xP
